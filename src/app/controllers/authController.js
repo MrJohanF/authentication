@@ -1,7 +1,7 @@
-const bcrypt = require('bcryptjs');
-const { PrismaClient } = require('@prisma/client');
-const { SignJWT } = require('jose');
-const { registerSchema, loginSchema } = require('../validation/authSchema.js');
+import bcrypt from 'bcryptjs';
+import { PrismaClient } from '@prisma/client';
+import { SignJWT } from 'jose';
+import { registerSchema, loginSchema } from '../validation/authSchema.js';
 
 const prisma = new PrismaClient();
 
@@ -17,9 +17,8 @@ const createToken = async (userId) => {
 };
 
 // Register a new user
-exports.register = async (req, res) => {
+export const register = async (req, res) => {
   try {
-    // Validate input with Zod
     const validation = registerSchema.safeParse(req.body);
     if (!validation.success) {
       return res.status(400).json({ 
@@ -30,7 +29,6 @@ exports.register = async (req, res) => {
 
     const { email, password, name } = validation.data;
     
-    // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email }
     });
@@ -39,11 +37,9 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Hash password with bcrypt
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create new user in DB
     const user = await prisma.user.create({
       data: {
         email,
@@ -58,15 +54,13 @@ exports.register = async (req, res) => {
       }
     });
 
-    // Create JWT
     const token = await createToken(user.id);
 
-    // Set JWT in cookie
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000 // 1 day
+      maxAge: 24 * 60 * 60 * 1000 
     });
 
     res.status(201).json({
@@ -80,9 +74,8 @@ exports.register = async (req, res) => {
 };
 
 // Login user
-exports.login = async (req, res) => {
+export const login = async (req, res) => {
   try {
-    // Validate input
     const validation = loginSchema.safeParse(req.body);
     if (!validation.success) {
       return res.status(400).json({ 
@@ -93,27 +86,23 @@ exports.login = async (req, res) => {
 
     const { email, password } = validation.data;
 
-    // Find user by email
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    // Compare passwords
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    // Create JWT
     const token = await createToken(user.id);
 
-    // Set cookie
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000 // 1 day
+      maxAge: 24 * 60 * 60 * 1000 
     });
 
     res.json({
@@ -132,14 +121,12 @@ exports.login = async (req, res) => {
 };
 
 // Logout user
-exports.logout = (req, res) => {
-  // Clear the 'token' cookie
+export const logout = (req, res) => {
   res.clearCookie('token');
   res.json({ message: 'Logged out successfully' });
 };
 
 // Get current user
-exports.me = (req, res) => {
-  // If authMiddleware passed, `req.user` is set
+export const me = (req, res) => {
   res.json({ user: req.user });
 };

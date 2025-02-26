@@ -1,9 +1,9 @@
-const { jwtVerify } = require('jose');
-const { PrismaClient } = require('@prisma/client');
+import { jwtVerify } from 'jose';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-module.exports = async (req, res, next) => {
+const authMiddleware = async (req, res, next) => {
   try {
     // Get token from cookies
     const token = req.cookies.token;
@@ -43,4 +43,4 @@ module.exports = async (req, res, next) => {
   }
 };
 
-
+export default authMiddleware;

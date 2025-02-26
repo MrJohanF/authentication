@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const { PrismaClient } = require('@prisma/client');
 const { SignJWT } = require('jose');
-const { registerSchema, loginSchema } = require('../../../validation/authSchema.js');
+const { registerSchema, loginSchema } = require('../validation/authSchema.js');
 
 const prisma = new PrismaClient();
 

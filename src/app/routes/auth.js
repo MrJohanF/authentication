@@ -1,8 +1,8 @@
 // src/app/routes/auth.js
 
 const express = require('express');
-const authMiddleware = require('../../middleware/auth'); 
-const { register, login, logout, me } = require('../controllers/authController'); 
+const authMiddleware = require('../middleware/auth'); // Updated path
+const { register, login, logout, me } = require('../controllers/authController');
 
 const router = express.Router();
 

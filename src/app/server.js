@@ -1,14 +1,14 @@
-// src\app\server.js
+// src/app/server.js
 
-const express = require("express");
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
-const authRoutes = require("./routes/auth");
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import authRoutes from "./routes/auth.js";
+import authMiddleware from "./middleware/auth.js";
 
 const app = express();
 
 // Middleware
-
 app.use(
   cors({
     origin: process.env.CORS_ORIGIN || "http://localhost:3000",
@@ -20,10 +20,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Routes
-
 app.use("/api/auth", authRoutes);
-
-const authMiddleware = require("./middleware/auth");
 
 app.get("/api/protected", authMiddleware, (req, res) => {
   res.json({

@@ -4,7 +4,7 @@
   "description": "",
   "license": "ISC",
   "author": "MrjohanF",
-  "type": "commonjs",
+  "type": "module",
   "main": "src/app/server.js",
   "scripts": {
     "start": "node src/app/server.js",

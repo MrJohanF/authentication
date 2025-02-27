@@ -25,6 +25,7 @@ const authMiddleware = async (req, res, next) => {
         id: true,
         email: true,
         name: true,
+        role: true,
         createdAt: true,
         updatedAt: true
       }

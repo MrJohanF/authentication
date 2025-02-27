@@ -59,7 +59,7 @@ export const register = async (req, res) => {
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'none',
       domain: '.ucommerce.live',
       maxAge: 24 * 60 * 60 * 1000 
     });
@@ -132,7 +132,7 @@ export const logout = (req, res) => {
     secure: isProduction,
     sameSite: 'none', // Use 'none' as you did in login
     domain: '.ucommerce.live',
-    path: '/' // Make sure to specify the path if you set one when creating
+    path: '/' 
   });
   
   console.log('Cookie cleared with options:', {

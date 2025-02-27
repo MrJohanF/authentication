@@ -62,7 +62,7 @@ export const register = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'none',
-      domain: '.ucommerce.live',
+      domain: 'localhost',
       maxAge: 24 * 60 * 60 * 1000 
     });
 
@@ -101,13 +101,19 @@ export const login = async (req, res) => {
 
     const token = await createToken(user.id);
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none',
-      domain: 'localhost',
-      maxAge: 24 * 60 * 60 * 1000 
-    });
+
+// Determine cookie domain based on environment
+const cookieDomain = process.env.NODE_ENV === 'production' 
+  ? '.ucommerce.live'
+  : undefined;
+
+res.cookie('token', token, {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  domain: cookieDomain,
+  maxAge: 24 * 60 * 60 * 1000 
+});
 
     res.json({
       user: {
@@ -124,30 +130,24 @@ export const login = async (req, res) => {
   }
 };
 
+
+
 // Logout user
 export const logout = (req, res) => {
-  console.log('Incoming cookies on logout:', req.cookies);
-
-  // Clear the cookie using the same options as when it was set
+  // Determine cookie domain based on environment
+  const cookieDomain = process.env.NODE_ENV === 'production' 
+    ? '.ucommerce.live'  // Production domain
+    : undefined;  // For localhost, let browser handle it
+    
+  // Clear the cookie
   res.clearCookie('token', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'none',
-    domain: 'localhost',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    domain: cookieDomain,
     path: '/'
   });
   
-  // As a backup, explicitly set an expired cookie
-  res.cookie('token', '', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'none',
-    domain: 'localhost',
-    path: '/',
-    expires: new Date(0)
-  });
-  
-  console.log('Attempting to clear token cookie');
   res.json({ message: 'Logged out successfully' });
 };
 

@@ -105,7 +105,7 @@ export const login = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'none',
-      domain,
+      domain: 'localhost',
       maxAge: 24 * 60 * 60 * 1000 
     });
 
@@ -133,7 +133,7 @@ export const logout = (req, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'none',
-    domain,
+    domain: 'localhost',
     path: '/'
   });
   
@@ -142,7 +142,7 @@ export const logout = (req, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'none',
-    domain,
+    domain: 'localhost',
     path: '/',
     expires: new Date(0)
   });

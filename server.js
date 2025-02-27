@@ -11,15 +11,20 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: ["https://ucommerce.live", "https://api.ucommerce.live" ],
+    origin: function(origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      
+      // Check if origin is allowed
+      if(origin.endsWith('ucommerce.live')) {
+        return callback(null, true);
+      }
+      
+      callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
   })
 );
-
-app.use((req, res, next) => {
-  console.log('Request from origin:', req.headers.origin);
-  next();
-});
 
 app.use(express.json());
 app.use(cookieParser());

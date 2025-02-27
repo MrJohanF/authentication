@@ -18,7 +18,7 @@ const createToken = async (userId) => {
 
 // Helper to generate cookie options consistently
 const getCookieOptions = () => {
-  const isProd = process.env.NODE_ENV === 'production';
+  const isProd = process.env.NODE_ENV === 'development';
   return {
     httpOnly: true,
     secure: isProd,

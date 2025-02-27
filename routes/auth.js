@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.post('/register', register);
 router.post('/login', login);
-router.get('/logout', logout);
+router.post('/logout', logout);  // changed from GET to POST
 router.get('/me', authMiddleware, me);
 
 export default router;

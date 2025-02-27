@@ -11,7 +11,7 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: [ process.env.CORS_ORIGIN || "https://ucommerce.live", "https://api.ucommerce.live" ],
+    origin: ["https://ucommerce.live", "https://api.ucommerce.live" ],
     credentials: true,
   })
 );

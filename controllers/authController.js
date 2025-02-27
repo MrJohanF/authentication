@@ -124,23 +124,39 @@ export const login = async (req, res) => {
 
 // Logout user
 export const logout = (req, res) => {
-  // Get the current protocol to determine if we're in production
-  const isProduction = process.env.NODE_ENV === 'production';
+  // Log the incoming cookies for debugging
+  console.log('Incoming cookies on logout:', req.cookies);
   
+  // Clear the cookie with very explicit options
   res.clearCookie('token', {
     httpOnly: true,
-    secure: isProduction,
-    sameSite: 'none', // Use 'none' as you did in login
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'none',
     domain: '.ucommerce.live',
-    path: '/' 
+    path: '/'
   });
   
-  console.log('Cookie cleared with options:', {
+  // For localhost testing
+  if (req.headers.origin && req.headers.origin.includes('localhost')) {
+    res.clearCookie('token', {
+      httpOnly: true,
+      sameSite: 'lax',
+      path: '/'
+    });
+  }
+  
+  // Set an expired cookie as a backup approach
+  res.cookie('token', '', {
     httpOnly: true,
-    secure: isProduction,
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'none',
-    domain: '.ucommerce.live'
+    domain: '.ucommerce.live',
+    path: '/',
+    maxAge: 1 // Set to expire immediately
   });
+  
+  // Log that we're attempting to clear
+  console.log('Attempting to clear token cookie');
   
   res.json({ message: 'Logged out successfully' });
 };

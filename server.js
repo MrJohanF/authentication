@@ -16,6 +16,11 @@ app.use(
   })
 );
 
+app.use((req, res, next) => {
+  console.log('Request from origin:', req.headers.origin);
+  next();
+});
+
 app.use(express.json());
 app.use(cookieParser());
 

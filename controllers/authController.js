@@ -124,7 +124,12 @@ export const login = async (req, res) => {
 
 // Logout user
 export const logout = (req, res) => {
-  res.clearCookie('token');
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'none', // Match what you used in login
+    domain: '.ucommerce.live',
+  });
   res.json({ message: 'Logged out successfully' });
 };
 

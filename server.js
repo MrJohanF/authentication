@@ -15,7 +15,9 @@ app.use(
       "https://ucommerce.live",
       "https://www.ucommerce.live",
       "http://localhost:3000",
-      "e-commerce-mrjohanfs-projects.vercel.app",
+      "https:api.ucommerce.live",
+      'https:www.api.ucommerce.live',
+      'https://e-commerce-mrjohanfs-projects.vercel.app',
     ],
     credentials: true,
   })

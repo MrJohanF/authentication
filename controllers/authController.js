@@ -1,4 +1,4 @@
-// controllers\authController.js
+// controllers/authController.js
 
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
@@ -16,6 +16,18 @@ const createToken = async (userId) => {
     .sign(new TextEncoder().encode(process.env.JWT_SECRET));
   
   return token;
+};
+
+// Determine cookie options based on environment
+const getCookieOptions = () => {
+  const isProd = process.env.NODE_ENV === 'production';
+  return {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
+    domain: isProd ? '.ucommerce.live' : undefined,
+    maxAge: 24 * 60 * 60 * 1000 // 1 day
+  };
 };
 
 // Register a new user
@@ -58,13 +70,8 @@ export const register = async (req, res) => {
 
     const token = await createToken(user.id);
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none',
-      domain: 'localhost',
-      maxAge: 24 * 60 * 60 * 1000 
-    });
+    // Use consistent cookie options
+    res.cookie('token', token, getCookieOptions());
 
     res.status(201).json({
       message: 'User registered successfully',
@@ -101,19 +108,8 @@ export const login = async (req, res) => {
 
     const token = await createToken(user.id);
 
-
-// Determine cookie domain based on environment
-const cookieDomain = process.env.NODE_ENV === 'production' 
-  ? '.ucommerce.live'
-  : undefined;
-
-res.cookie('token', token, {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-  domain: cookieDomain,
-  maxAge: 24 * 60 * 60 * 1000 
-});
+    // Use consistent cookie options
+    res.cookie('token', token, getCookieOptions());
 
     res.json({
       user: {
@@ -130,27 +126,16 @@ res.cookie('token', token, {
   }
 };
 
-
-
 // Logout user
 export const logout = (req, res) => {
-  // Determine cookie domain based on environment
-  const cookieDomain = process.env.NODE_ENV === 'production' 
-    ? '.ucommerce.live'  // Production domain
-    : undefined;  // For localhost, let browser handle it
-    
-  // Clear the cookie
-  res.clearCookie('token', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    domain: cookieDomain,
-    path: '/'
-  });
-  
+  // Use the same cookie options as when setting the cookie
+  const options = getCookieOptions();
+  // Remove maxAge from clear options as it is not needed
+  delete options.maxAge;
+
+  res.clearCookie('token', { ...options, path: '/' });
   res.json({ message: 'Logged out successfully' });
 };
-
 
 // Get current user
 export const me = (req, res) => {

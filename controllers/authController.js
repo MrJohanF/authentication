@@ -1,5 +1,3 @@
-// controllers/authController.js
-
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
 import { SignJWT } from 'jose';
@@ -18,7 +16,7 @@ const createToken = async (userId) => {
   return token;
 };
 
-// Determine cookie options based on environment
+// Helper to generate cookie options consistently
 const getCookieOptions = () => {
   const isProd = process.env.NODE_ENV === 'production';
   return {
@@ -26,7 +24,8 @@ const getCookieOptions = () => {
     secure: isProd,
     sameSite: isProd ? 'none' : 'lax',
     domain: isProd ? '.ucommerce.live' : undefined,
-    maxAge: 24 * 60 * 60 * 1000 // 1 day
+    maxAge: 24 * 60 * 60 * 1000, // 1 day
+    path: '/'  // ensure path is consistent for setting and clearing the cookie
   };
 };
 
@@ -43,10 +42,7 @@ export const register = async (req, res) => {
 
     const { email, password, name } = validation.data;
     
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
-    });
-
+    const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists' });
     }
@@ -55,22 +51,13 @@ export const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const user = await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        name
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        createdAt: true
-      }
+      data: { email, password: hashedPassword, name },
+      select: { id: true, email: true, name: true, createdAt: true }
     });
 
     const token = await createToken(user.id);
 
-    // Use consistent cookie options
+    // Set cookie with consistent options
     res.cookie('token', token, getCookieOptions());
 
     res.status(201).json({
@@ -95,7 +82,6 @@ export const login = async (req, res) => {
     }
 
     const { email, password } = validation.data;
-
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
@@ -108,7 +94,7 @@ export const login = async (req, res) => {
 
     const token = await createToken(user.id);
 
-    // Use consistent cookie options
+    // Set cookie with consistent options
     res.cookie('token', token, getCookieOptions());
 
     res.json({
@@ -128,12 +114,11 @@ export const login = async (req, res) => {
 
 // Logout user
 export const logout = (req, res) => {
-  // Use the same cookie options as when setting the cookie
   const options = getCookieOptions();
-  // Remove maxAge from clear options as it is not needed
+  // Remove maxAge for clearCookie as it isn't needed
   delete options.maxAge;
-
-  res.clearCookie('token', { ...options, path: '/' });
+  
+  res.clearCookie('token', options);
   res.json({ message: 'Logged out successfully' });
 };
 

@@ -11,20 +11,16 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: function(origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
-      
-      // Check if origin is allowed
-      if(origin.endsWith('ucommerce.live')) {
-        return callback(null, true);
-      }
-      
-      callback(new Error('Not allowed by CORS'));
-    },
+    origin: [
+      "https://ucommerce.live",
+      "https://www.ucommerce.live",
+      "http://localhost:3000",
+      "e-commerce-mrjohanfs-projects.vercel.app",
+    ],
     credentials: true,
   })
 );
+
 
 app.use(express.json());
 app.use(cookieParser());

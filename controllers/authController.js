@@ -106,14 +106,11 @@ export const login = async (req, res) => {
     });
 
     res.json({
-      message: 'Login successful',
-      user: {
         id: user.id,
         email: user.email,
         name: user.name,
         role: user.role,
         createdAt: user.createdAt
-      }
     });
   } catch (error) {
     console.error('Login error:', error);

@@ -124,16 +124,31 @@ export const login = async (req, res) => {
 
 // Logout user
 export const logout = (req, res) => {
+  // Get the current protocol to determine if we're in production
+  const isProduction = process.env.NODE_ENV === 'production';
+  
   res.clearCookie('token', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'none', // Match what you used in login
+    secure: isProduction,
+    sameSite: 'none', // Use 'none' as you did in login
     domain: '.ucommerce.live',
+    path: '/' // Make sure to specify the path if you set one when creating
   });
+  
+  console.log('Cookie cleared with options:', {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: 'none',
+    domain: '.ucommerce.live'
+  });
+  
   res.json({ message: 'Logged out successfully' });
 };
 
 // Get current user
 export const me = (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ message: 'Not authenticated' });
+  }
   res.json({ user: req.user });
 };

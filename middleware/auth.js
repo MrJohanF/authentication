@@ -1,3 +1,5 @@
+// middleware\auth.js
+
 import { jwtVerify } from 'jose';
 import { PrismaClient } from '@prisma/client';
 

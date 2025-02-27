@@ -1,3 +1,5 @@
+// controllers\authController.js
+
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
 import { SignJWT } from 'jose';
@@ -124,10 +126,9 @@ export const login = async (req, res) => {
 
 // Logout user
 export const logout = (req, res) => {
-  // Log the incoming cookies for debugging
   console.log('Incoming cookies on logout:', req.cookies);
-  
-  // Clear the cookie with very explicit options
+
+  // Clear the cookie using the same options as when it was set
   res.clearCookie('token', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -136,30 +137,20 @@ export const logout = (req, res) => {
     path: '/'
   });
   
-  // For localhost testing
-  if (req.headers.origin && req.headers.origin.includes('localhost')) {
-    res.clearCookie('token', {
-      httpOnly: true,
-      sameSite: 'lax',
-      path: '/'
-    });
-  }
-  
-  // Set an expired cookie as a backup approach
+  // As a backup, explicitly set an expired cookie
   res.cookie('token', '', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'none',
     domain: '.ucommerce.live',
     path: '/',
-    maxAge: 1 // Set to expire immediately
+    expires: new Date(0)
   });
   
-  // Log that we're attempting to clear
   console.log('Attempting to clear token cookie');
-  
   res.json({ message: 'Logged out successfully' });
 };
+
 
 // Get current user
 export const me = (req, res) => {

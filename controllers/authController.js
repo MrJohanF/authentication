@@ -23,7 +23,7 @@ const getCookieOptions = () => {
     httpOnly: true,
     secure: isProd,
     sameSite: isProd ? 'none' : 'lax',
-    domain: isProd ? '.ucommerce.live' : undefined,
+    domain: isProd ? 'ucommerce.live' : undefined,
     maxAge: 24 * 60 * 60 * 1000, // 1 day
     path: '/'  // ensure path is consistent for setting and clearing the cookie
   };
